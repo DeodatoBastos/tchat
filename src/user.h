@@ -14,8 +14,8 @@ class Users {
 public:
     Users(double p_message, double p_user, int num_users);
     Users(double p_message, double p_user);
-    void send_message(int user_id, std::string message);
-    void create_connection(int user_id);
+    void send_message(int src_id, int dest_id, std::string message);
+    void create_connection();
     void close_connection();
     void create_user(std::string name = "");
     void simulate();

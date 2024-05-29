@@ -1,5 +1,7 @@
 #include "user.h"
-#include <cstdio>
+#include "utils.h"
+#include <cstdlib>
+#include <ctime>
 #include <netinet/in.h>
 #include <string>
 #include <sys/socket.h>
@@ -18,7 +20,7 @@ Users::Users(double p_msg, double p_u) : p_message(p_msg), p_user(p_u) {
     client_socket = socket(AF_INET, SOCK_STREAM, 0);
 }
 
-void Users::create_connection(int user_id) {
+void Users::create_connection() {
     sockaddr_in address;
     address.sin_family = AF_INET;
     address.sin_port = htons(8080);
@@ -42,9 +44,10 @@ void Users::close_connection() {
     }
 }
 
-void Users::send_message(int user_id, std::string message) {
-    create_connection(user_id);
-    send(client_socket, message.c_str(), message.size(), 0);
+void Users::send_message(int src_id, int dest_id, std::string message) {
+    create_connection();
+    std::string encoded_msg = encode_message(src_id, dest_id, message);
+    send(client_socket, encoded_msg.c_str(), encoded_msg.size(), 0);
     close_connection();
 }
 
@@ -53,4 +56,19 @@ void Users::create_user(std::string name) {
         name = "user_" + std::to_string(users.size());
     }
     users.push_back(name);
+}
+
+void Users::simulate() {
+    while (true) {
+        srand((unsigned) time(NULL));
+        if ((double) std::rand()/ RAND_MAX > p_message) {
+            int src_id = std::rand() % users.size();
+            int dest_id = std::rand() % users.size();
+            send_message(src_id, dest_id, "random message to sent");
+        }
+        if ((double) std::rand()/ RAND_MAX > p_user) {
+            std::string name = std::to_string(users.size()) + "_user";
+            users.push_back(name);
+        }
+    }
 }
