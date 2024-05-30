@@ -38,8 +38,7 @@ void Server::handle_message() {
     recv(client_socket, buffer, sizeof(buffer), 0);
     int src_id, dest_id;
     std::string msg = decode_message(std::string(buffer), src_id, dest_id);
-    std::cout << "from: " << src_id << "; to: " << dest_id << "; msg: " << msg
-              << std::endl;
+    std::cout << "from: " << src_id << "; to: " << dest_id << "; msg: " << msg << "\n";
   }
 }
 
