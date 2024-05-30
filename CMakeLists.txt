@@ -1,39 +1,42 @@
 cmake_minimum_required(VERSION 3.10)
 
-cmake_policy(SET CMP0048 NEW)
+# cmake_policy(SET CMP0048 NEW)
 project(tchat VERSION 0.0.1 LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 include(CMakePrintHelpers)
 cmake_print_variables(CMAKE_VERSION)
 
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  # Specify the commit you depend on and update it regularly.
-  URL https://github.com/google/googletest/archive/5376968f6948923e2411081fd9372e71a59d8e77.zip
-)
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
+enable_testing()
+
+# Download and unpack googletest at configure time
+configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
+execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+if(result)
+  message(FATAL_ERROR "CMake step for googletest failed: ${result}")
+endif()
+execute_process(COMMAND ${CMAKE_COMMAND} --build .
+  RESULT_VARIABLE result
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+if(result)
+  message(FATAL_ERROR "Build step for googletest failed: ${result}")
+endif()
+
+# Add googletest directly to our build. This defines the gtest and gtest_main targets.
+add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
+                 ${CMAKE_BINARY_DIR}/googletest-build
+                 EXCLUDE_FROM_ALL)
 
 
-# Now simply link your own targets against gtest, gmock,
-# etc. as appropriate
+add_subdirectory(src)
+add_subdirectory(test)
 
-include(GoogleTest)
+add_executable(client main_users.cpp)
+target_link_libraries(client PRIVATE ${CMAKE_PROJECT_NAME})
 
-SET(SRC "src" CACHE FILEPATH "Directory with sources")
-
-FILE(GLOB sources ${SRC}/*.cpp)
-add_executable(tchat_tests test/test_utils.cpp ${sources})
-
-include_directories( ${SRC} include )
-
-target_link_libraries(tchat_tests gtest gtest_main )
- 
-gtest_discover_tests(tchat_tests)
-
-
-
-
-
+add_executable(server main_server.cpp)
+target_link_libraries(server PRIVATE ${CMAKE_PROJECT_NAME})
