@@ -1,10 +1,13 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.20)
 
 # cmake_policy(SET CMP0048 NEW)
 project(tchat VERSION 0.0.1 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
+set( CMAKE_CXX_FLAGS_DEBUG  "-fsanitize=address -fsanitize=leak -g")
+set( CMAKE_CXX_FLAGS_RELEASE  "")
+set( CMAKE_CXX_FLAGS  "-Ofast -DNDEBUG -std=c++20 -march=native -fpic -ftree-vectorize -pedantic -Wall -Wextra -Werror ")
 
 include(CMakePrintHelpers)
 cmake_print_variables(CMAKE_VERSION)
