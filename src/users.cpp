@@ -1,5 +1,6 @@
 #include "users.h"
 #include "utils.h"
+#include <cstdio>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
@@ -19,14 +20,18 @@ Users::Users(double p_msg, double p_u, int n, int port) : p_message(p_msg), p_us
     address.sin_addr.s_addr = INADDR_ANY;
     server_address = address;
     client_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if (client_socket == -1) {
+        perror("Couldn't create the socket");
+        exit(EXIT_FAILURE);
+    }
 }
 
 void Users::create_connection() {
     int err = connect(client_socket, (struct sockaddr *)&server_address, sizeof(server_address));
 
-    if (err != 0) {
+    if (err == -1) {
         perror("Unable to estabelish a connection. Try again later.");
-        return;
+        exit(EXIT_FAILURE);
     }
 
     active = true;
@@ -36,9 +41,9 @@ void Users::create_connection() {
 void Users::close_connection() {
     int err = close(client_socket);
 
-    if (err != 0) {
+    if (err == -1) {
         perror("Unable to close the connection.");
-        return;
+        exit(EXIT_FAILURE);
     }
 
     active = false;
@@ -47,13 +52,22 @@ void Users::close_connection() {
 
 void Users::send_message(int src_id, int dest_id, std::string message) {
     std::string encoded_msg = encode_message(src_id, dest_id, message);
-    send(client_socket, encoded_msg.c_str(), encoded_msg.size(), 0);
+    int err = send(client_socket, encoded_msg.c_str(), encoded_msg.size(), 0);
+    if (err == -1) {
+        perror("Could not sent the message.");
+        exit(EXIT_FAILURE);
+    }
 }
 
 void Users::handle_message() {
     int src_id, dest_id;
     char buffer[1024] = {0};
-    recv(client_socket, buffer, sizeof(buffer), 0);
+    // int err = recv(client_socket, buffer, sizeof(buffer), 0);
+    int err = recv(client_socket, buffer, 1024, 0);
+    if (err == -1) {
+        perror("Erro while receiving the message.");
+        exit(EXIT_FAILURE);
+    }
     std::string message(buffer);
     if (!message.empty()) {
         std::string msg = decode_message(message, src_id, dest_id);

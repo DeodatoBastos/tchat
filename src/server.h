@@ -15,7 +15,7 @@ class Server {
 
   public:
     Server(int domain = AF_INET, int type = SOCK_STREAM, int protocol = 0, int port = 8080,
-           int addres = INADDR_ANY, int num_requests = 5);
+           int addres = INADDR_ANY, int num_requests = 20);
     ~Server();
     void listen_client();
     void handle_message();
