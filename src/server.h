@@ -13,12 +13,15 @@ class Server {
     int n_requests;
     bool active;
 
+    bool is_single_thread;
+
   public:
     Server(int domain = AF_INET, int type = SOCK_STREAM, int protocol = 0, int port = 8080,
-           int addres = INADDR_ANY, int num_requests = 20);
+           int addres = INADDR_ANY, int num_requests = 100, bool is_single_thread = false);
     ~Server();
     void listen_client();
-    void handle_message();
+    void accept_connection();
+    static void *handle_message(void *socket_arg);
     void close_connection();
 };
 
