@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set( CMAKE_CXX_FLAGS_DEBUG  "-fsanitize=address -fsanitize=leak -g")
 set( CMAKE_CXX_FLAGS_RELEASE  "-O3 -fpic -ftree-vectorize ")
-set( CMAKE_CXX_FLAGS  "-DNDEBUG -std=c++20 -march=native -pedantic -Wall -Wextra -Werror -fsanitize=address -fsanitize=leak -g")
+set( CMAKE_CXX_FLAGS  "-DNDEBUG -std=c++17 -march=native -pedantic -Wall -Wextra -Werror -fsanitize=address -fsanitize=leak -g")
 
 include(CMakePrintHelpers)
 cmake_print_variables(CMAKE_VERSION)
